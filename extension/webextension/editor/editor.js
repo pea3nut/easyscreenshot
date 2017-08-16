@@ -1035,9 +1035,21 @@
     }
   };
 
+  Chaz.init("editor.content");
+  const Background = new Chaz("background");
+  window.addEventListener("load", async function() {
+      document.title = browser.i18n.getMessage("editor_title");
+      var data = await Background.send("fetch");
+      var img = new Image();
+      img.onload = function() {
+          Editor.init(img);
+      };
+      img.src = data.dataUrl;
+  });
+  /*
   window.addEventListener("load", function(evt) {
     chrome.storage.local.get(Object.keys(Editor.prefs), function(results) {
-      Editor.prefs = Utils.extend(Editor.prefs, results);
+      Editor.prefs = Utils.extend(, results);
       chrome.runtime.sendMessage(undefined, {
         "dir": "editor2bg",
         "type": "editor_ready"
@@ -1063,3 +1075,4 @@
       Floatbar.items[item].uninit();
     }
   });
+//*/

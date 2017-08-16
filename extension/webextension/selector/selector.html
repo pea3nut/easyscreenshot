@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        *{
+            margin:0;
+            padding:0;
+        }
+        img,canvas{
+            position: absolute;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+        }
+        img{
+            z-index:100;
+        }
+        canvas{
+            z-index:200;
+        }
+        body{
+            height:100%;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+    <script src="/lib/Chaz.js"></script>
+    <script src="app.js"></script>
+    <script src="selector.js"></script>
+</body>
+</html>
