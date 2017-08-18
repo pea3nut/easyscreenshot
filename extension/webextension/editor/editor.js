@@ -860,6 +860,7 @@
 
       this.canvas = Utils.qs("#display");
       try {
+        // todo : zoom image
         this.canvas.width = img.width;
         this.canvas.height = img.height;
         this.ctx.drawImage(img, 0, 0);
@@ -1035,17 +1036,19 @@
     }
   };
 
-  Chaz.init("editor.content");
-  const Background = new Chaz("background");
-  window.addEventListener("load", async function() {
-      document.title = browser.i18n.getMessage("editor_title");
-      var data = await Background.send("fetch");
-      var img = new Image();
-      img.onload = function() {
-          Editor.init(img);
-      };
-      img.src = data.dataUrl;
+~async function() {
+  await new Promise(function(resolve) {
+      window.addEventListener("load", resolve);
   });
+  await Chaz.init("editor.content");
+  const Background = new Chaz("background");
+  var data = await Background.send("fetch");
+  var img = new Image();
+  img.onload = function() {
+      Editor.init(img);
+  };
+  img.src = data.dataUrl;
+}().catch(e => { throw e });
   /*
   window.addEventListener("load", function(evt) {
     chrome.storage.local.get(Object.keys(Editor.prefs), function(results) {

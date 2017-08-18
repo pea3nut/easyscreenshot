@@ -27,8 +27,11 @@ class App {
 
     }
     cut() {
-        var width = Math.abs(this.data.startX - this.data.endX);
-        var height = Math.abs(this.data.startY - this.data.endY);
+        // when image cut, position is relative to view port
+        // so, the position need not think about image reel size, it's relative to canvas box size
+        var {row, column} = this.countRatio();
+        var width = Math.abs(this.data.startX - this.data.endX) * row;
+        var height = Math.abs(this.data.startY - this.data.endY) * column;
         var x = Math.min(this.data.startX, this.data.endX);
         var y = Math.min(this.data.startY, this.data.endY);
 
@@ -214,6 +217,11 @@ class App {
         this.bindResolve();
     }
     drawBox([x1, y1], [x2, y2]) {
+        var {row, column} = this.countRatio();
+        x1 *= row;
+        x2 *= row;
+        y1 *= column;
+        y2 *= column;
         this.fill();// 遮罩全部
         this.ctx.clearRect(x1, y1, x2 - x1, y2 - y1);// 清除部分遮罩，使其透明
         // 画边框附近的8个点
@@ -249,7 +257,14 @@ class App {
         );
     }
 }
-
+/** count image size : canvas show size*/
+App.prototype.countRatio = function() {
+    var style = getComputedStyle(this.canvas);
+    return {
+        row: this.canvas.width / Number.parseInt(style.width),
+        column: this.canvas.height / Number.parseInt(style.height)
+    };
+};
 App.getResizeComputedFunction = function(point, box, [addX, addY]) {
     /*
         Start↘
@@ -269,7 +284,7 @@ App.getResizeComputedFunction = function(point, box, [addX, addY]) {
 
     const GetDirectionFunctions = [
         function() {
- return (
+return (
             !(Math.abs(startX - pointX) < Math.abs(endX - pointX)) // X接近end为正方向
         )
 },
