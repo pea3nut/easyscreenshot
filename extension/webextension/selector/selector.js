@@ -18,7 +18,6 @@
                     type: "ok",
                     ...this.cut()
                 });
-                Content.send("cut", {token: data.token, ...this.cut()});
             };
             app.onabort = function() {
                 resolve({

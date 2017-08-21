@@ -10,14 +10,12 @@ Popup.on("select", PrintScreenLauncher.select);
 Popup.on("entire", PrintScreenLauncher.entire);
 Popup.on("visible", PrintScreenLauncher.visible);
 
-Popup.on("open", function(data) {
-    browser.tabs.create(data);
-});
+Popup.on("open", browser.tabs.create);
 
 
-// 当收到content script发送的loaded事件才enable按钮
-// 因此当扩展进入没有content script存在的页面时，按钮将不会被启用
-// 比如：about:blank addons.mozilla.org
+// The browserAction button will enable when receive loaded event from content script
+// so, if page has not content, then browserAction button will disable
+// e.g. about:blank addons.mozilla.org
 browser.tabs.onCreated.addListener(function(tab) {
     browser.browserAction.disable(tab.id);
 });

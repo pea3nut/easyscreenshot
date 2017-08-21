@@ -30,7 +30,7 @@ document.getElementById("run-screenshot").addEventListener("click", function(e) 
     window.close();
 });
 
-// 渲染多语言支持菜单
+// render i18n menu
 Array.from(
     document.querySelectorAll("[chaz-i18n]")
 ).forEach(elt => elt.textContent = browser.i18n.getMessage(elt.getAttribute("chaz-i18n")));

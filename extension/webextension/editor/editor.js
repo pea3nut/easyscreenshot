@@ -1038,44 +1038,18 @@
 
 ~async function() {
   await new Promise(function(resolve) {
-      window.addEventListener("load", resolve);
+    window.addEventListener("load", resolve);
+    chrome.storage.local.get(Object.keys(Editor.prefs), function(results) {
+      Editor.prefs = Utils.extend(Editor.prefs, results);
+    });
   });
   await Chaz.init("editor.content");
   const Background = new Chaz("background");
   var data = await Background.send("fetch");
   var img = new Image();
   img.onload = function() {
-      Editor.init(img);
+    Editor.init(img);
   };
   img.src = data.dataUrl;
 }().catch(e => { throw e });
-  /*
-  window.addEventListener("load", function(evt) {
-    chrome.storage.local.get(Object.keys(Editor.prefs), function(results) {
-      Editor.prefs = Utils.extend(, results);
-      chrome.runtime.sendMessage(undefined, {
-        "dir": "editor2bg",
-        "type": "editor_ready"
-      }, undefined, function(response) {
-        var dataUri = response && response.dataUri;
-        if (!dataUri) {
-          Editor.init();
-          return;
-        }
-        var img = new Image();
-        img.onload = function(evt) {
-          Editor.init(evt.target);
-          img = undefined;
-        }
-        img.src = dataUri;
-      });
-    });
-    document.title = chrome.i18n.getMessage("editor_title");
-  });
 
-  window.addEventListener("unload", function(evt) {
-    for (var item in Floatbar.items) {
-      Floatbar.items[item].uninit();
-    }
-  });
-//*/

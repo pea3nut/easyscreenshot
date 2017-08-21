@@ -55,13 +55,13 @@ class App {
     }
     bindBoxResize() {
         const ResizeCursor = ["nwse-resize", "ns-resize", "nesw-resize", "ew-resize"];
-        var overPoint = null;// 鼠标驻留在的resize点
+        var overPoint = null;// the border resize point with mouse over
         this.canvas.addEventListener("mousemove", e => {
             if (this.state_1 !== "selected") return;
             this.state_2 = null;
             var nowX = e.layerX;
             var nowY = e.layerY;
-            // 检测是否位于边框调整点上
+            // detect whether the mouse is over on the border resize point
             for (
                 let point
                 of
@@ -81,9 +81,9 @@ class App {
                     break;
                 }
             }
-            // 检测是否位于图像内部
+            // detect whether the mouse is over on selected area
             if (this.state_2 !== "resize-box") {
-                if (this.state_2 === "move-box") { // 上次的收尾
+                if (this.state_2 === "move-box") { // last time aftermath
                     this.state_2 = null;
                     document.body.style.cursor = null;
                 }
@@ -126,7 +126,7 @@ class App {
             });
             document.addEventListener("mouseup", () => {
                 document.removeEventListener("mousemove", moveListener);
-                if (this.state_1 !== "resizing") return;// 也就是说，根本没move
+                if (this.state_1 !== "resizing") return;// so, it's not to move
                 this.state_1 = "selected";
                 this.data = newBox;
             }, {once: true});
@@ -154,7 +154,7 @@ class App {
             });
             document.addEventListener("mouseup", () => {
                 document.removeEventListener("mousemove", moveListener);
-                if (this.state_1 !== "moving") return;// 也就是说，根本没move
+                if (this.state_1 !== "moving") return;// so, it's not to move
                 this.state_1 = "selected";
                 this.data.startX += (moveX - downX);
                 this.data.startY += (moveY - downY);
@@ -187,7 +187,7 @@ class App {
             });
             document.addEventListener("mouseup", () => {
                 document.removeEventListener("mousemove", moveListener);
-                if (this.state_1 !== "selecting") return;// 也就是说，根本没move
+                if (this.state_1 !== "selecting") return;// so, it's not to move
                 this.state_1 = "selected";
                 this.data.startX = downX;
                 this.data.startY = downY;
@@ -222,9 +222,9 @@ class App {
         x2 *= row;
         y1 *= column;
         y2 *= column;
-        this.fill();// 遮罩全部
-        this.ctx.clearRect(x1, y1, x2 - x1, y2 - y1);// 清除部分遮罩，使其透明
-        // 画边框附近的8个点
+        this.fill();// shade all
+        this.ctx.clearRect(x1, y1, x2 - x1, y2 - y1);// clear area，to transparent
+        // draw border resize point
         for (let [x, y] of App.borderPoint([x1, y1], [x2, y2])) {
             this.ctx.beginPath();
             this.ctx.arc(x, y, App.borderPointDrawRadius, 0, Math.PI * 4);
@@ -256,109 +256,116 @@ class App {
             this.canvas.height
         );
     }
-}
-/** count image size : canvas show size*/
-App.prototype.countRatio = function() {
-    var style = getComputedStyle(this.canvas);
-    return {
-        row: this.canvas.width / Number.parseInt(style.width),
-        column: this.canvas.height / Number.parseInt(style.height)
-    };
-};
-App.getResizeComputedFunction = function(point, box, [addX, addY]) {
-    /*
-        Start↘
-            -0 -1 -2
-            -3    +3
-            +2 +1 +0
-                   End
 
-        End
-            +0 +1 +2
-            +3    -3
-            -2 -1 -0
-                  ↖Start
-    */
-    var [pointX, pointY, pointType] = point;
-    var {startX, startY, endX, endY} = box;
-
-    const GetDirectionFunctions = [
-        function() {
-return (
-            !(Math.abs(startX - pointX) < Math.abs(endX - pointX)) // X接近end为正方向
-        )
-},
-        function() {
-return (
-            !(Math.abs(startY - pointY) < Math.abs(endY - pointY)) // Y接近end为正方向
-        )
-},
-        function() {
- return (
-            Math.abs(startX - pointX) < Math.abs(endX - pointX) // X接近end为反方向
-        )
-},
-        function() {
- return (
-            !(Math.abs(startX - pointX) < Math.abs(endX - pointX)) // X接近end为正方向
-        )
-},
-    ];
-    const ResizeFunctions = [
-        function() {
-            return direction
-                ? {x: "endX", y: "endY"}
-                : {x: "startX", y: "startY"}
-                ;
-        },
-        function() {
-            return direction
-                ? {x: null, y: "endY"}
-                : {x: null, y: "startY"}
-                ;
-        },
-        function() {
-            return direction
-                ? {x: "startX", y: "endY"}
-                : {x: "endX", y: "startY"}
-                ;
-        },
-        function() {
-            return direction
-                ? {x: "endX", y: null}
-                : {x: "startX", y: null}
-                ;
-        },
-    ];
+    /** under is private*/
 
     /**
-     * 方向，图解见函数头部
-     * true表示正向，false表示反向
-     * @type {Boolean}
+     * count:
+     *   image size : canvas show size
      * */
-    var direction = GetDirectionFunctions[pointType]();
-    var {x, y} = ResizeFunctions[pointType]();
+    countRatio() {
+        var style = getComputedStyle(this.canvas);
+        return {
+            row: this.canvas.width / Number.parseInt(style.width),
+            column: this.canvas.height / Number.parseInt(style.height)
+        };
+    }
+    static getResizeComputedFunction(point, box, [addX, addY]) {
+        /*
+            Start↘
+                -0 -1 -2
+                -3    +3
+                +2 +1 +0
+                       End
 
-    box = JSON.parse(JSON.stringify(box));
-    if (x)box[x] += addX;
-    if (y)box[y] += addY;
-    return box;
-};
+            End
+                +0 +1 +2
+                +3    -3
+                -2 -1 -0
+                      ↖Start
+        */
+        var [pointX, pointY, pointType] = point;
+        var {startX, startY, endX, endY} = box;
+
+        const GetDirectionFunctions = [
+            // the type x point
+            function() {
+return (
+                !(Math.abs(startX - pointX) < Math.abs(endX - pointX)) // near X-end is positive direction
+            )
+},
+            function() {
+return (
+                !(Math.abs(startY - pointY) < Math.abs(endY - pointY)) // near Y-end is positive direction
+            )
+},
+            function() {
+return (
+                Math.abs(startX - pointX) < Math.abs(endX - pointX) // near X-end is negative direction
+            )
+},
+            function() {
+ return (
+                !(Math.abs(startX - pointX) < Math.abs(endX - pointX)) // near X-end is positive direction
+            )
+},
+        ];
+        const ResizeFunctions = [
+            function() {
+                return direction
+                    ? {x: "endX", y: "endY"}
+                    : {x: "startX", y: "startY"}
+                ;
+            },
+            function() {
+                return direction
+                    ? {x: null, y: "endY"}
+                    : {x: null, y: "startY"}
+                ;
+            },
+            function() {
+                return direction
+                    ? {x: "startX", y: "endY"}
+                    : {x: "endX", y: "startY"}
+                ;
+            },
+            function() {
+                return direction
+                    ? {x: "endX", y: null}
+                    : {x: "startX", y: null}
+                ;
+            },
+        ];
+
+        /**
+         * The direction
+         * true is positive direction, false is negative direction
+         * @type {Boolean}
+         * */
+        var direction = GetDirectionFunctions[pointType]();
+        var {x, y} = ResizeFunctions[pointType]();
+
+        box = JSON.parse(JSON.stringify(box));
+        if (x)box[x] += addX;
+        if (y)box[y] += addY;
+        return box;
+    }
+    static borderPoint([x1, y1], [x2, y2]) {
+        /*
+            the array third item is point type, the point sort:
+            0 1 2
+            3   3
+            2 1 0
+        */
+        return [
+            [x1, y1, 0], [x2, y2, 0],
+            [(x1 + x2) / 2, y1, 1], [(x1 + x2) / 2, y2, 1],
+            [x1, y2, 2], [x2, y1, 2],
+            [x1, (y1 + y2) / 2, 3], [x2, (y1 + y2) / 2, 3],
+        ];
+    }
+}
 App.borderPointDrawRadius = 4;
 App.borderPointTriggerRadius = 6;
-App.borderPoint = function([x1, y1], [x2, y2]) {
-    /*
-        第三个数字表示点的类型，点类型分布如下
-        0 1 2
-        3   3
-        2 1 0
-    */
-    return [
-        [x1, y1, 0], [x2, y2, 0],
-        [(x1 + x2) / 2, y1, 1], [(x1 + x2) / 2, y2, 1],
-        [x1, y2, 2], [x2, y1, 2],
-        [x1, (y1 + y2) / 2, 3], [x2, (y1 + y2) / 2, 3],
-    ];
-};
 App.borderPointColor = "rgba(200,200,200,0.7)";
 App.fillColor = "rgba(0,0,0,0.6)";

@@ -11,9 +11,9 @@ module.exports = {
     "Chaz": true,
   },
   "parserOptions" :{
-      "ecmaFeatures" :{
-          "experimentalObjectRestSpread" :true,
-      },
+    "ecmaFeatures" :{
+      "experimentalObjectRestSpread" :true,
+    },
   },
   "plugins": [
     "mozilla"

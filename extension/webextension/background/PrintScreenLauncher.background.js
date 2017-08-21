@@ -1,6 +1,6 @@
 /* global Content, Editor */
 
-/* !截图启动器*/
+/** capture action launcher*/
 class PrintScreenLauncher {
     static async select() {
         var activeTabId = await Chaz.Utility.getActivatedTabId();
@@ -20,11 +20,12 @@ class PrintScreenLauncher {
         var imgInfo = await Content.send("visible", null, activeTabId);
         await PrintScreenLauncher.openEditor(imgInfo);
     }
+    /** @private*/
+    static async openEditor(imgInf) {
+        await browser.tabs.create({
+            url: browser.extension.getURL("editor/editor.html"),
+            active: true,
+        });
+        Editor.one("fetch", () => imgInf);
+    }
 }
-PrintScreenLauncher.openEditor = async function(imgInf) {
-    await browser.tabs.create({
-        url: browser.extension.getURL("editor/editor.html"),
-        active: true,
-    });
-    Editor.one("fetch", () => imgInf);
-};

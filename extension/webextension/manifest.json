@@ -3,14 +3,14 @@
     "name": "__MSG_extensionName__",
     "version": "2.55.2",
     "icons": {
-        "64": "images/easyscreenshot-new-icon.png"
+        "64": "images/easyscreenshot-icon.png"
     },
     "description": "__MSG_extensionDescription__",
     "homepage_url": "http://www.firefox.com.cn/",
     "applications": {
         "gecko": {
-            "id": "easyscreenshot@mozillaonline.com",
-            "strict_min_version": "54.0.1"
+            "id": "easyscreenshot2@mozillaonline.com",
+            "strict_min_version": "54.0"
         }
     },
     "permissions": [
@@ -24,7 +24,7 @@
             "lib/Chaz.js",
             "editor/editor.background.js",
             "background/PrintScreenLauncher.background.js",
-            "background/easyscreenshot-new.background.js"
+            "background/easyscreenshot.background.js"
         ]
     },
     "content_scripts": [
@@ -36,7 +36,7 @@
                 "lib/Chaz.js",
                 "content/PrintScreen.content.js",
                 "selector/Selector.content.js",
-                "content/easyscreenshot-new.content.js"
+                "content/easyscreenshot.content.js"
             ],
             "run_at": "document_end"
         }
@@ -45,14 +45,13 @@
         "editor/page.html",
         "editor/audio/capture.ogg",
         "editor/audio/export.ogg",
-        "selector/selector.html",
-        "content/develop-test.png"
+        "selector/selector.html"
     ],
     "default_locale": "en_US",
     "browser_action": {
         "browser_style": true,
-        "default_icon": "images/easyscreenshot-new-browser_action.png",
-        "default_popup": "popup/easyscreenshot-new.popup.html",
+        "default_icon": "images/easyscreenshot-browser_action.png",
+        "default_popup": "popup/easyscreenshot.popup.html",
         "default_title": "__MSG_browserActionTitle__"
     }
 }
